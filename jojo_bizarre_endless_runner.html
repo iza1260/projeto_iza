@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OVERDRIVE DASH: MENACING RUN</title>
+    <!-- Google Fonts for stylized manga typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Mochiy+Pop+One&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --jojo-purple: #2A085C;
+            --jojo-magenta: #FF007F;
+            --jojo-yellow: #FFE600;
+            --jojo-cyan: #00E5FF;
+            --jojo-green: #00FF66;
+            --jojo-dark: #12032B;
+        }
+
+        body {
+            background-color: var(--jojo-dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 127, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 229, 255, 0.15) 0%, transparent 40%),
+                linear-gradient(135deg, #12032B 0%, #2A085C 50%, #0D021E 100%);
+            font-family: 'Mochiy Pop One', sans-serif;
+            color: #FFFFFF;
+            overflow-x: hidden;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .font-bangers {
+            font-family: 'Bangers', cursive, sans-serif;
+            letter-spacing: 2px;
+        }
+
+        .jojo-title-shadow {
+            text-shadow: 
+                4px 4px 0px #FF007F,
+                8px 8px 0px #FFE600,
+                12px 12px 0px #000000;
+        }
+
+        .jojo-box-border {
+            border: 4px solid #FFE600;
+            box-shadow: 
+                6px 6px 0px #FF007F,
+                12px 12px 0px #000000;
+        }
+
+        .jojo-btn {
+            background: linear-gradient(180deg, #FFE600 0%, #FF9900 100%);
+            color: #000000;
+            font-family: 'Bangers', cursive;
+            font-size: 1.8rem;
+            text-shadow: 1px 1px 0px #FFF;
+            border: 3px solid #000;
+            box-shadow: 4px 4px 0px #FF007F;
+            transition: all 0.1s ease-in-out;
+            cursor: pointer;
+        }
+
+        .jojo-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #FF007F;
+            background: linear-gradient(180deg, #FFF066 0%, #FFB300 100%);
+        }
+
+        .jojo-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #FF007F;
+        }
+
+        /* Speed lines overlay effect */
+        .speed-lines {
+            background: repeating-radial-gradient(
+                circle at 50% 50%,
+                transparent 0,
+                transparent 10px,
+                rgba(255, 230, 0, 0.03) 10px,
+                rgba(255, 230, 0, 0.03) 11px
+            );
+        }
+
+        /* Halftone dot pattern background element */
+        .halftone-bg {
+            background-image: radial-gradient(#FF007F 15%, transparent 16%);
+            background-size: 16px 16px;
+            opacity: 0.15;
+        }
+
+        canvas {
+            display: block;
+            border-radius: 8px;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-2 md:p-6 relative">
+
+    <div class="fixed inset-0 halftone-bg pointer-events-none z-0"></div>
+    <div class="fixed inset-0 speed-lines pointer-events-none z-0"></div>
+
+    <header class="w-full max-w-4xl text-center my-2 md:my-4 z-10 flex flex-col items-center">
+        <div class="inline-block relative">
+            <span class="absolute -top-6 -left-8 text-yellow-300 font-bangers text-xl md:text-2xl transform -rotate-12 bg-pink-600 px-2 py-0.5 rounded border border-black z-20 animate-pulse">
+                GO! GO! GO!
+            </span>
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-bangers jojo-title-shadow text-yellow-300 tracking-wider transform -skew-x-6 uppercase">
+                OVERDRIVE DASH
+            </h1>
+            <span class="block text-pink-500 text-lg md:text-2xl font-bangers tracking-widest text-right -mt-2 md:-mt-3 transform skew-x-12 pr-4">
+                MENACING RUN 戈戈戈
+            </span>
+        </div>
+        <p class="text-xs md:text-sm text-cyan-300 mt-2 font-bold uppercase tracking-wider bg-purple-950/80 px-4 py-1 rounded-full border border-pink-500/50 shadow-lg">
+            ⚡ A Bizarre Endless Runner Experience! ⚡
+        </p>
+    </header>
+
+    <main class="w-full max-w-4xl flex flex-col items-center z-10 my-auto">
+        <!-- Game Container Box -->
+        <div class="w-full relative jojo-box-border bg-purple-950 p-2 md:p-3 rounded-lg flex flex-col items-center overflow-hidden">
+            
+            <!-- Top Bar inside Canvas Frame -->
+            <div class="w-full flex justify-between items-center px-2 py-1 mb-2 bg-black/40 rounded border border-purple-800 text-xs md:text-sm">
+                <div class="flex items-center space-x-2">
+                    <span class="text-yellow-400 font-bangers text-base md:text-lg">STAND:</span>
+                    <span class="text-cyan-300 font-bold uppercase tracking-wide">STAR OVERDRIVE</span>
+                </div>
+                
+                <!-- Audio Mute/Unmute Toggle -->
+                <button id="mute-btn" class="bg-pink-600 hover:bg-pink-500 text-white px-3 py-1 rounded font-bangers text-sm border border-black flex items-center space-x-1 transition">
+                    <span id="mute-icon">🔊</span>
+                    <span id="mute-text">SOM: ON</span>
+                </button>
+            </div>
+
+            <!-- HTML5 Game Canvas -->
+            <div class="w-full aspect-[16/9] max-h-[70vh] relative flex items-center justify-center">
+                <canvas id="gameCanvas" class="w-full h-full shadow-2xl border-2 border-yellow-400"></canvas>
+            </div>
+
+            <!-- Control instructions directly below screen -->
+            <div class="w-full text-center mt-2 bg-black/60 py-2 px-3 rounded border border-yellow-500/30 flex flex-wrap justify-around items-center text-xs md:text-sm text-yellow-300 font-bold gap-2">
+                <div class="flex items-center space-x-1">
+                    <span class="bg-pink-600 text-white px-2 py-0.5 rounded border border-black font-bangers">ESPAÇO</span>
+                    <span class="bg-pink-600 text-white px-2 py-0.5 rounded border border-black font-bangers">SETA CIMA</span>
+                    <span>ou</span>
+                    <span class="bg-cyan-500 text-black px-2 py-0.5 rounded border border-black font-bangers">TOQUE NA TELA</span>
+                    <span>= PULAR / PULO DUPLO</span>
+                </div>
+                <div class="text-pink-400 text-xs italic">
+                    [ Atalho 'R' para Reiniciar ]
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="w-full max-w-4xl mt-4 md:mt-6 z-10">
+        <div class="bg-purple-900/90 border-2 border-pink-500 rounded-lg p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
+            <!-- High score card -->
+            <div class="flex items-center space-x-4 bg-black/60 p-3 rounded-lg border border-yellow-400 w-full md:w-auto justify-center md:justify-start">
+                <div class="text-3xl md:text-4xl">🏆</div>
+                <div>
+                    <div class="text-xs text-cyan-300 font-bold uppercase tracking-wider">MAIOR PONTUAÇÃO (HIGH SCORE)</div>
+                    <div id="high-score-display" class="text-2xl md:text-3xl font-bangers text-yellow-300 tracking-wider">
+                        00000 PTS
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lore description block -->
+            <div class="text-xs md:text-sm text-gray-200 text-center md:text-left max-w-xl leading-relaxed">
+                <span class="text-yellow-300 font-bold">COMO JOGAR:</span> Guie o excêntrico protagonista <span class="text-pink-400 font-bold">JOJO</span> e seu lendário Stand <span class="text-cyan-300 font-bold">STAR OVERDRIVE</span> em uma corrida desenfreada! Desvie dos monólitos e estátuas menacing. Execute saltos duplos para superar os maiores obstáculos e alcançar a pontuação máxima!
+            </div>
+        </div>
+        <div class="text-center text-gray-500 text-xs mt-3 font-mono">
+            OVERDRIVE DASH &copy; 2026 - PURE VANILLA JS CANVAS GAME
+        </div>
+    </footer>
+
+    <script>
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playJump() {
+                if (this.muted || !this.ctx) return;
+                this.init();
+                
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.18);
+                
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.18);
+                
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.18);
+            }
+
+            playDoubleJump() {
+                if (this.muted || !this.ctx) return;
+                this.init();
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(900, this.ctx.currentTime + 0.22);
+
+                gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.22);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.22);
+            }
+
+            playScoreMilestone() {
+                if (this.muted || !this.ctx) return;
+                this.init();
+
+                const now = this.ctx.currentTime;
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+                    gain.gain.setValueAtTime(0.2, now + idx * 0.06);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.1);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now + idx * 0.06);
+                    osc.stop(now + idx * 0.06 + 0.1);
+                });
+            }
+
+            playGameOver() {
+                if (this.muted || !this.ctx) return;
+                this.init();
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(60, this.ctx.currentTime + 0.5);
+
+                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.5);
+            }
+        }
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const sfx = new SoundFX();
+
+        // Virtual internal canvas dimensions for consistent crisp physics
+        const GAME_WIDTH = 960;
+        const GAME_HEIGHT = 540;
+        canvas.width = GAME_WIDTH;
+        canvas.height = GAME_HEIGHT;
+
+        // Game State Variables
+        let gameState = 'START'; // 'START', 'PLAYING', 'GAMEOVER'
+        let score = 0;
+        let highScore = parseInt(localStorage.getItem('jojo_dash_highscore') || '0', 10);
+        let speed = 6.5;
+        const BASE_SPEED = 6.5;
+        const MAX_SPEED = 16;
+        let frameCount = 0;
+        let distanceCovered = 0;
+
+        // HTML Score UI updates
+        const highScoreDisplay = document.getElementById('high-score-display');
+        function updateHighScoreText() {
+            highScoreDisplay.textContent = String(highScore).padStart(5, '0') + ' PTS';
+        }
+        updateHighScoreText();
+
+        const muteBtn = document.getElementById('mute-btn');
+        const muteIcon = document.getElementById('mute-icon');
+        const muteText = document.getElementById('mute-text');
+
+        muteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sfx.muted = !sfx.muted;
+            if (sfx.muted) {
+                muteIcon.textContent = '🔇';
+                muteText.textContent = 'SOM: OFF';
+                muteBtn.classList.replace('bg-pink-600', 'bg-gray-700');
+            } else {
+                muteIcon.textContent = '🔊';
+                muteText.textContent = 'SOM: ON';
+                muteBtn.classList.replace('bg-gray-700', 'bg-pink-600');
+                sfx.init();
+            }
+        });
+
+        const mangaWords = ["MENACING!", "ORA!", "GO!", "WHAM!", "DODGE!", "OVERDRIVE!", "BOOM!", "ZRRA!"];
+        let floatingTexts = [];
+        let particles = [];
+
+        function spawnOnomatopoeia(x, y, text = null, customColor = null) {
+            const word = text || mangaWords[Math.floor(Math.random() * mangaWords.length)];
+            floatingTexts.push({
+                x: x,
+                y: y,
+                text: word,
+                color: customColor || (Math.random() > 0.5 ? '#FFE600' : '#FF007F'),
+                size: Math.floor(24 + Math.random() * 16),
+                alpha: 1.0,
+                vx: (Math.random() - 0.5) * 2,
+                vy: -2 - Math.random() * 2,
+                rot: (Math.random() - 0.5) * 0.4
+            });
+        }
+
+        function createDustParticles(x, y, count = 5) {
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: -speed * 0.3 + (Math.random() - 0.5) * 3,
+                    vy: (Math.random() - 0.5) * 2 - 1,
+                    radius: Math.random() * 5 + 2,
+                    color: Math.random() > 0.5 ? '#00E5FF' : '#FF007F',
+                    alpha: 1.0,
+                    decay: 0.03 + Math.random() * 0.02
+                });
+            }
+        }
+
+        const GROUND_Y = 440;
+
+        const player = {
+            x: 120,
+            y: GROUND_Y - 90,
+            width: 50,
+            height: 90,
+            vy: 0,
+            gravity: 0.75,
+            jumpForce: -16.5,
+            isGrounded: false,
+            jumpCount: 0,
+            maxJumps: 2,
+            animFrame: 0,
+            
+            reset() {
+                this.y = GROUND_Y - this.height;
+                this.vy = 0;
+                this.isGrounded = true;
+                this.jumpCount = 0;
+                this.animFrame = 0;
+            },
+
+            jump() {
+                if (this.jumpCount < this.maxJumps) {
+                    this.vy = this.jumpForce;
+                    this.jumpCount++;
+                    this.isGrounded = false;
+                    
+                    if (this.jumpCount === 1) {
+                        sfx.playJump();
+                        spawnOnomatopoeia(this.x + 30, this.y, "JUMP!", "#00E5FF");
+                    } else {
+                        sfx.playDoubleJump();
+                        spawnOnomatopoeia(this.x + 30, this.y, "OVERDRIVE!", "#FFE600");
+                        createDustParticles(this.x + 25, this.y + 45, 12);
+                    }
+                }
+            },
+
+            update() {
+                this.vy += this.gravity;
+                this.y += this.vy;
+
+                // Ground Collision
+                if (this.y >= GROUND_Y - this.height) {
+                    this.y = GROUND_Y - this.height;
+                    this.vy = 0;
+                    if (!this.isGrounded) {
+                        createDustParticles(this.x + 25, GROUND_Y - 5, 6);
+                    }
+                    this.isGrounded = true;
+                    this.jumpCount = 0;
+                }
+
+                this.animFrame += 0.2 + (speed / 30);
+            },
+
+            draw() {
+                // 1. Draw Stand Aura (Floating right behind player)
+                const standX = this.x - 25 + Math.sin(frameCount * 0.1) * 5;
+                const standY = this.y - 15 + Math.cos(frameCount * 0.1) * 5;
+
+                ctx.save();
+                ctx.globalAlpha = 0.55 + Math.sin(frameCount * 0.2) * 0.15;
+                // Stand Outer Glow
+                ctx.shadowColor = '#00E5FF';
+                ctx.shadowBlur = 15;
+
+                // Stand Silhouette
+                ctx.fillStyle = '#FF007F';
+                ctx.beginPath();
+                ctx.ellipse(standX + 25, standY + 45, 28, 50, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Stand Hair / Head shape
+                ctx.fillStyle = '#00E5FF';
+                ctx.beginPath();
+                ctx.arc(standX + 28, standY + 15, 18, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Stand Glowing Eyes
+                ctx.fillStyle = '#FFE600';
+                ctx.fillRect(standX + 32, standY + 12, 6, 3);
+                ctx.fillRect(standX + 22, standY + 12, 6, 3);
+                ctx.restore();
+
+                // 2. Draw Protagonist Character
+                ctx.save();
+                
+                // Shadow on ground
+                ctx.fillStyle = 'rgba(0,0,0,0.4)';
+                const shadowScale = Math.max(0.2, 1 - (GROUND_Y - (this.y + this.height)) / 200);
+                ctx.beginPath();
+                ctx.ellipse(this.x + 25, GROUND_Y - 2, 25 * shadowScale, 6 * shadowScale, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                const legAngle = Math.sin(this.animFrame) * 0.6;
+
+                // Body positioning offset during jump
+                const px = this.x;
+                const py = this.y;
+
+                // Flowing Jacket Back
+                ctx.fillStyle = '#2A085C';
+                ctx.strokeStyle = '#FFE600';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(px + 15, py + 30);
+                ctx.lineTo(px - 18 - (speed * 0.8), py + 55 + Math.sin(frameCount * 0.3) * 8);
+                ctx.lineTo(px + 20, py + 65);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // Legs (Pants)
+                ctx.lineWidth = 8;
+                ctx.strokeStyle = '#12032B';
+                
+                if (this.isGrounded) {
+                    // Running Leg 1
+                    ctx.beginPath();
+                    ctx.moveTo(px + 25, py + 55);
+                    ctx.lineTo(px + 25 + Math.sin(legAngle) * 20, py + 85);
+                    ctx.stroke();
+                    // Running Leg 2
+                    ctx.beginPath();
+                    ctx.moveTo(px + 25, py + 55);
+                    ctx.lineTo(px + 25 - Math.sin(legAngle) * 20, py + 85);
+                    ctx.stroke();
+                } else {
+                    // Jumping pose legs
+                    ctx.beginPath();
+                    ctx.moveTo(px + 25, py + 55);
+                    ctx.lineTo(px + 5, py + 75);
+                    ctx.lineTo(px + 20, py + 88);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(px + 25, py + 55);
+                    ctx.lineTo(px + 40, py + 75);
+                    ctx.stroke();
+                }
+
+                // Torso / Jacket
+                ctx.fillStyle = '#2A085C';
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 3;
+                ctx.fillRect(px + 12, py + 25, 28, 35);
+                ctx.strokeRect(px + 12, py + 25, 28, 35);
+
+                // Golden Belt Accent
+                ctx.fillStyle = '#FFE600';
+                ctx.fillRect(px + 10, py + 52, 32, 6);
+
+                // Head & Face
+                ctx.fillStyle = '#FFD1A4'; // Skin
+                ctx.fillRect(px + 18, py + 10, 18, 18);
+
+                // JoJo Hair (Stylized High Pompadour / Spikes)
+                ctx.fillStyle = '#FF007F';
+                ctx.beginPath();
+                ctx.moveTo(px + 12, py + 12);
+                ctx.lineTo(px + 5, py - 8);
+                ctx.lineTo(px + 25, py - 12);
+                ctx.lineTo(px + 40, py + 5);
+                ctx.lineTo(px + 36, py + 15);
+                ctx.closePath();
+                ctx.fill();
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Sunglasses / Visor
+                ctx.fillStyle = '#00E5FF';
+                ctx.fillRect(px + 22, py + 14, 16, 6);
+                ctx.fillStyle = '#FFF';
+                ctx.fillRect(px + 24, py + 15, 4, 2); // Shine
+
+                // High Collar Coat
+                ctx.fillStyle = '#FFE600';
+                ctx.beginPath();
+                ctx.moveTo(px + 12, py + 25);
+                ctx.lineTo(px + 8, py + 12);
+                ctx.lineTo(px + 20, py + 25);
+                ctx.fill();
+
+                ctx.restore();
+            }
+        };
+
+        let obstacles = [];
+        let obstacleTimer = 0;
+
+        class Obstacle {
+            constructor() {
+                this.type = Math.floor(Math.random() * 3); // 0: Monolith, 1: Statue, 2: Energy Pillars
+                this.width = 40 + Math.random() * 20;
+                this.height = 50 + Math.random() * 40;
+                this.x = GAME_WIDTH + 50;
+                this.y = GROUND_Y - this.height;
+                this.passed = false;
+                this.color = Math.random() > 0.5 ? '#FF007F' : '#00E5FF';
+            }
+
+            update() {
+                this.x -= speed;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = '#000';
+
+                if (this.type === 0) {
+                    // Stand Monolith with glowing rune
+                    ctx.fillStyle = '#2A085C';
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                    ctx.strokeRect(this.x, this.y, this.width, this.height);
+
+                    // Glowing center rune symbol
+                    ctx.fillStyle = this.color;
+                    ctx.shadowColor = this.color;
+                    ctx.shadowBlur = 10;
+                    ctx.font = '20px Bangers';
+                    ctx.fillText('ゴ', this.x + this.width / 2 - 8, this.y + this.height / 2 + 6);
+                } else if (this.type === 1) {
+                    // Roman Bust Statue (Neon JoJo aesthetic)
+                    ctx.fillStyle = '#FFE600';
+                    ctx.beginPath();
+                    ctx.moveTo(this.x, this.y + this.height);
+                    ctx.lineTo(this.x + this.width / 2, this.y);
+                    ctx.lineTo(this.x + this.width, this.y + this.height);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#FF007F';
+                    ctx.fillRect(this.x + 8, this.y + 15, this.width - 16, 8);
+                } else {
+                    // Energy Spike Monolith
+                    ctx.fillStyle = '#00E5FF';
+                    ctx.beginPath();
+                    ctx.moveTo(this.x, this.y + this.height);
+                    ctx.lineTo(this.x + 10, this.y);
+                    ctx.lineTo(this.x + this.width - 10, this.y);
+                    ctx.lineTo(this.x + this.width, this.y + this.height);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                }
+
+                ctx.restore();
+            }
+
+            getBounds() {
+                // Slightly forgiving collision box
+                const padding = 6;
+                return {
+                    left: this.x + padding,
+                    right: this.x + this.width - padding,
+                    top: this.y + padding,
+                    bottom: this.y + this.height
+                };
+            }
+        }
+
+        let bgOffset1 = 0;
+        let bgOffset2 = 0;
+
+        function drawParallaxBackground() {
+            // 1. Psychedelic Sky Gradient
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
+            skyGrad.addColorStop(0, '#12032B');
+            skyGrad.addColorStop(0.5, '#2A085C');
+            skyGrad.addColorStop(1, '#FF007F');
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+            // 2. Distant Katakana Symbols Floating ("MENACING" / ゴゴゴ)
+            ctx.save();
+            ctx.fillStyle = 'rgba(255, 230, 0, 0.12)';
+            ctx.font = '48px Mochiy Pop One';
+            for (let i = 0; i < 5; i++) {
+                const kx = ((frameCount * 1.5 + i * 220) % (GAME_WIDTH + 100)) - 50;
+                const ky = 80 + (i % 3) * 60;
+                ctx.fillText('ゴ', GAME_WIDTH - kx, ky);
+            }
+            ctx.restore();
+
+            // 3. Far City Silhouette (Layer 1)
+            bgOffset1 = (bgOffset1 + speed * 0.2) % 300;
+            ctx.fillStyle = 'rgba(20, 3, 45, 0.7)';
+            for (let x = -bgOffset1; x < GAME_WIDTH + 300; x += 60) {
+                const h = 120 + Math.sin(x) * 40;
+                ctx.fillRect(x, GROUND_Y - h - 40, 58, h + 40);
+            }
+
+            // 4. Midground Buildings with Neon Windows (Layer 2)
+            bgOffset2 = (bgOffset2 + speed * 0.5) % 200;
+            ctx.fillStyle = '#1A043B';
+            for (let x = -bgOffset2; x < GAME_WIDTH + 200; x += 80) {
+                const h = 80 + (x % 3) * 30;
+                ctx.fillRect(x, GROUND_Y - h, 76, h);
+                
+                // Neon Window accents
+                ctx.fillStyle = (x % 160 === 0) ? '#00E5FF' : '#FF007F';
+                ctx.fillRect(x + 15, GROUND_Y - h + 20, 12, 12);
+                ctx.fillRect(x + 45, GROUND_Y - h + 20, 12, 12);
+                ctx.fillStyle = '#1A043B';
+            }
+
+            // 5. Stylized Perspective Ground
+            ctx.fillStyle = '#0D021E';
+            ctx.fillRect(0, GROUND_Y, GAME_WIDTH, GAME_HEIGHT - GROUND_Y);
+
+            // Top Ground Gold Stripe
+            ctx.fillStyle = '#FFE600';
+            ctx.fillRect(0, GROUND_Y, GAME_WIDTH, 6);
+
+            // Animated Speed Grid Lines on Ground
+            ctx.strokeStyle = 'rgba(255, 0, 127, 0.4)';
+            ctx.lineWidth = 2;
+            const gridOffset = (frameCount * speed) % 40;
+            for (let x = -gridOffset; x < GAME_WIDTH; x += 40) {
+                ctx.beginPath();
+                ctx.moveTo(x, GROUND_Y + 6);
+                ctx.lineTo(x - 40, GAME_HEIGHT);
+                ctx.stroke();
+            }
+        }
+
+        function updateAndDrawEffects() {
+            // Particles update & draw
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= p.decay;
+
+                if (p.alpha <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // Floating Onomatopoeias update & draw
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                const ft = floatingTexts[i];
+                ft.x += ft.vx;
+                ft.y += ft.vy;
+                ft.alpha -= 0.02;
+
+                if (ft.alpha <= 0) {
+                    floatingTexts.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.globalAlpha = ft.alpha;
+                ctx.translate(ft.x, ft.y);
+                ctx.rotate(ft.rot);
+                ctx.font = `900 ${ft.size}px Bangers`;
+                
+                // Black stroke outline for comic effect
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 4;
+                ctx.strokeText(ft.text, 0, 0);
+
+                ctx.fillStyle = ft.color;
+                ctx.fillText(ft.text, 0, 0);
+                ctx.restore();
+            }
+        }
+
+        function drawHUD() {
+            ctx.save();
+            // Score Box Upper Right
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(GAME_WIDTH - 220, 15, 205, 50);
+            ctx.strokeStyle = '#FFE600';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(GAME_WIDTH - 220, 15, 205, 50);
+
+            ctx.font = '24px Bangers';
+            ctx.fillStyle = '#FFE600';
+            ctx.fillText('SCORE: ' + String(score).padStart(5, '0'), GAME_WIDTH - 205, 48);
+
+            // Speed Indicator Upper Left
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(15, 15, 160, 36);
+            ctx.strokeStyle = '#00E5FF';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(15, 15, 160, 36);
+
+            ctx.font = '16px Bangers';
+            ctx.fillStyle = '#00E5FF';
+            ctx.fillText('VELOCIDADE: ' + (speed / BASE_SPEED).toFixed(1) + 'X', 25, 38);
+            ctx.restore();
+        }
+
+        function drawStartScreen() {
+            ctx.save();
+            ctx.fillStyle = 'rgba(18, 3, 43, 0.85)';
+            ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+            ctx.textAlign = 'center';
+            
+            // Dramatic Title in Canvas
+            ctx.font = '64px Bangers';
+            ctx.fillStyle = '#000';
+            ctx.fillText('READY TO RUN?', GAME_WIDTH / 2 + 4, GAME_HEIGHT / 2 - 40 + 4);
+            ctx.fillStyle = '#FFE600';
+            ctx.fillText('READY TO RUN?', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 40);
+
+            ctx.font = '24px Mochiy Pop One';
+            ctx.fillStyle = '#FF007F';
+            ctx.fillText('PRESSIONE ESPAÇO OU TOQUE PARA COMECAR', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 30);
+
+            // Pulsing emblem
+            const scale = 1 + Math.sin(frameCount * 0.1) * 0.05;
+            ctx.font = `${36 * scale}px Bangers`;
+            ctx.fillStyle = '#00E5FF';
+            ctx.fillText('ゴ ゴ MENACING ゴ ゴ', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 100);
+
+            ctx.restore();
+        }
+
+        function drawGameOverScreen() {
+            ctx.save();
+            ctx.fillStyle = 'rgba(18, 3, 43, 0.9)';
+            ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+            ctx.textAlign = 'center';
+
+            // KABOOM / RETIREMENT Title
+            ctx.font = '72px Bangers';
+            ctx.fillStyle = '#000';
+            ctx.fillText('RETIRED! (GAME OVER)', GAME_WIDTH / 2 + 4, 150 + 4);
+            ctx.fillStyle = '#FF007F';
+            ctx.fillText('RETIRED! (GAME OVER)', GAME_WIDTH / 2, 150);
+
+            // Score Card Box
+            ctx.fillStyle = '#2A085C';
+            ctx.fillRect(GAME_WIDTH / 2 - 180, 200, 360, 140);
+            ctx.strokeStyle = '#FFE600';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(GAME_WIDTH / 2 - 180, 200, 360, 140);
+
+            ctx.font = '28px Bangers';
+            ctx.fillStyle = '#FFF';
+            ctx.fillText('PONTUAÇÃO FINAL: ' + score, GAME_WIDTH / 2, 245);
+
+            ctx.fillStyle = '#FFE600';
+            ctx.fillText('RECORD: ' + highScore, GAME_WIDTH / 2, 290);
+
+            // Restart Button Graphic inside Canvas
+            ctx.fillStyle = '#FFE600';
+            ctx.fillRect(GAME_WIDTH / 2 - 140, 370, 280, 55);
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(GAME_WIDTH / 2 - 140, 370, 280, 55);
+
+            ctx.font = '28px Bangers';
+            ctx.fillStyle = '#000';
+            ctx.fillText('JOGAR NOVAMENTE (ESPAÇO)', GAME_WIDTH / 2, 407);
+
+            ctx.restore();
+        }
+
+        function resetGame() {
+            score = 0;
+            speed = BASE_SPEED;
+            distanceCovered = 0;
+            frameCount = 0;
+            obstacles = [];
+            particles = [];
+            floatingTexts = [];
+            player.reset();
+            gameState = 'PLAYING';
+            spawnOnomatopoeia(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 50, "GO!", "#FFE600");
+        }
+
+        function gameOver() {
+            gameState = 'GAMEOVER';
+            sfx.playGameOver();
+            spawnOnomatopoeia(player.x + 20, player.y + 20, "KABOOM!", "#FF007F");
+
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('jojo_dash_highscore', highScore);
+                updateHighScoreText();
+            }
+        }
+
+        function checkCollisions() {
+            const pBounds = {
+                left: player.x + 10,
+                right: player.x + player.width - 10,
+                top: player.y + 10,
+                bottom: player.y + player.height
+            };
+
+            for (let obs of obstacles) {
+                const oBounds = obs.getBounds();
+                if (
+                    pBounds.right > oBounds.left &&
+                    pBounds.left < oBounds.right &&
+                    pBounds.bottom > oBounds.top &&
+                    pBounds.top < oBounds.bottom
+                ) {
+                    gameOver();
+                    break;
+                }
+            }
+        }
+
+        function update() {
+            frameCount++;
+
+            if (gameState !== 'PLAYING') return;
+
+            // Update Player
+            player.update();
+
+            // Progressive speed increase
+            speed = Math.min(MAX_SPEED, BASE_SPEED + Math.floor(score / 150) * 0.5);
+
+            // Update Score based on distance
+            distanceCovered += speed;
+            const newScore = Math.floor(distanceCovered / 10);
+            
+            // Score milestone sound
+            if (newScore > 0 && newScore % 100 === 0 && newScore !== score) {
+                sfx.playScoreMilestone();
+                spawnOnomatopoeia(GAME_WIDTH - 100, 80, "100 PTS!", "#00FF66");
+            }
+            score = newScore;
+
+            // Spawn Obstacles
+            obstacleTimer++;
+            const spawnRate = Math.max(60, 130 - Math.floor(speed * 4));
+            if (obstacleTimer > spawnRate) {
+                if (Math.random() < 0.75) {
+                    obstacles.push(new Obstacle());
+                    obstacleTimer = 0;
+                }
+            }
+
+            // Update Obstacles
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                const obs = obstacles[i];
+                obs.update();
+
+                // Random MENACING onomatopoeia when passing obstacle safely
+                if (!obs.passed && obs.x + obs.width < player.x) {
+                    obs.passed = true;
+                    if (Math.random() < 0.3) {
+                        spawnOnomatopoeia(player.x, player.y - 20, "DODGE!", "#00E5FF");
+                    }
+                }
+
+                // Remove offscreen
+                if (obs.x + obs.width < -50) {
+                    obstacles.splice(i, 1);
+                }
+            }
+
+            // Check collision
+            checkCollisions();
+        }
+
+        function render() {
+            // Clear Frame
+            ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+            // 1. Draw Parallax Environment
+            drawParallaxBackground();
+
+            // 2. Draw Obstacles
+            for (let obs of obstacles) {
+                obs.draw();
+            }
+
+            // 3. Draw Player & Stand
+            player.draw();
+
+            // 4. Draw Particle Effects & Floating Onomatopoeias
+            updateAndDrawEffects();
+
+            // 5. Draw UI / HUD or Overlays
+            if (gameState === 'PLAYING') {
+                drawHUD();
+            } else if (gameState === 'START') {
+                drawStartScreen();
+            } else if (gameState === 'GAMEOVER') {
+                drawGameOverScreen();
+            }
+        }
+
+        function gameLoop() {
+            update();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function handleInput() {
+            if (gameState === 'START') {
+                resetGame();
+            } else if (gameState === 'PLAYING') {
+                player.jump();
+            } else if (gameState === 'GAMEOVER') {
+                resetGame();
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+                e.preventDefault();
+                handleInput();
+            } else if (e.code === 'KeyR' && gameState === 'GAMEOVER') {
+                e.preventDefault();
+                resetGame();
+            }
+        });
+
+        // Touch & Canvas Click Controls
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            handleInput();
+        }, { passive: false });
+
+        canvas.addEventListener('mousedown', (e) => {
+            // Prevent triggering input if clicking top mute button region
+            if (e.clientY < 50) return;
+            handleInput();
+        });
+
+        window.onload = () => {
+            gameLoop();
+        };
+    </script>
+</body>
+</html>
